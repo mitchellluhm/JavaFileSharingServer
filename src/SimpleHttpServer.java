@@ -28,6 +28,7 @@ public class SimpleHttpServer {
 		HttpServer server = HttpServer.create(new InetSocketAddress(8003), 0);
 		server.createContext("/info", new InfoHandler());
 		server.createContext("/get", new GetHandler(fc.get_all_files()[0]));
+		server.createContext("/get2", new GetHandler(fc.get_all_files()[1]));
 		server.setExecutor(null); // creates a default executor
 		server.start();
 	}
