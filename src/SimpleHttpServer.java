@@ -27,8 +27,13 @@ public class SimpleHttpServer {
 		
 		HttpServer server = HttpServer.create(new InetSocketAddress(8003), 0);
 		server.createContext("/info", new InfoHandler());
-		server.createContext("/get", new GetHandler(fc.get_all_files()[0]));
-		server.createContext("/get2", new GetHandler(fc.get_all_files()[1]));
+		
+		int n_files = fc.get_all_files().length;
+		for (int i=0; i < n_files; i++) {
+			server.createContext("/file" + i, new GetHandler(fc.get_all_files()[i]));
+		}
+//		server.createContext("/get", new GetHandler(fc.get_all_files()[0]));
+//		server.createContext("/get2", new GetHandler(fc.get_all_files()[1]));
 		server.setExecutor(null); // creates a default executor
 		server.start();
 	}
@@ -69,12 +74,11 @@ public class SimpleHttpServer {
 
 		public void handle(HttpExchange t) throws IOException {
 
-			// add the required response header for a PDF file
+			// add the required response header for a file
 			Headers h = t.getResponseHeaders();
 			h.add("Content-Type", "application/pdf");
 
-			// a PDF (you provide your own!)
-			// File file = new File ("/home/mitchell/eclipse-workspace/DummyProject/src/python_sockets.pdf");
+			// Provide a file path on the host mahine
 			File file = new File (this.get_this_file());
 			byte [] bytearray  = new byte [(int)file.length()];
 			FileInputStream fis = new FileInputStream(file);
@@ -82,7 +86,7 @@ public class SimpleHttpServer {
 			bis.read(bytearray, 0, bytearray.length);
 			bis.close();
 
-			// ok, we are ready to send the response.
+			// Send response
 			t.sendResponseHeaders(200, file.length());
 			OutputStream os = t.getResponseBody();
 			os.write(bytearray,0,bytearray.length);
